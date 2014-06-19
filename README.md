@@ -45,7 +45,7 @@ Now we are done and ready to use Haml with Phalcon.
 Render hierarchy
 ------
 
-PhalconHaml implements own render hierarchy similar to default Phalcon hierarchy.
+PhalconHaml implements own render hierarchy, similar to default Phalcon hierarchy.
 
 ### Layout
 
@@ -62,7 +62,7 @@ We always can set custom layout for controller or action just by call setMainVie
 If we don't set main view in config file, PhalconHaml will search directly in your view directory for file with controller name. For ex. if you trigger IndexController parser will try to render index.html.haml file from your view directory.
 
 ### Content render
-PhalconHaml gives you flexibility. You can decide how to organize your views files. By default parser assign two variables: $controller and $action. You can use as you want to include your action or controller view. Use include token a compose view file path:
+PhalconHaml gives you flexibility. You can decide how to organize your views files. By default parser assign two variables: $controller and $action. You can use as you want to include your action or controller view. Use include token to compose view file path:
 
 ```php
 //include [controlerName]/[actionName][yourExtenstion] file
@@ -75,7 +75,7 @@ File struct
 ```
 /views
 - index -> controler name dir
--- index.html.haml -> main page content
+-- index.html.haml -> index page content
 - head.html.haml -> file with header content
 - layout.html.haml -> main view file
 - menu.html.haml -> menu file

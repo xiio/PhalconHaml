@@ -1,17 +1,11 @@
 <?php
+
 /**
  * Haml parser.
  *
  * @link http://haml.hamptoncatlin.com/ Original Haml parser (for Ruby)
  * @license http://www.opensource.org/licenses/mit-license.php MIT (X11) License
  * @author Amadeusz Jasak <amadeusz.jasak@gmail.com>
- * @package phpHaml
- */
-
-/**
- * Modifications
- *
- * @author Tomasz Ksionek <dev@ksionek.com>
  * @package phpHaml
  */
 class HamlParser
@@ -90,7 +84,7 @@ class HamlParser
 	 * The constructor
 	 *
 	 * @param string Path to files
-	 * @param boolean/string Compile templates (can be path)
+	 * @param boolean /string Compile templates (can be path)
 	 * @param object Parent parser
 	 */
 	public function __construct($sPath = false, $bCompile = true, $oParent = null)
@@ -196,38 +190,34 @@ class HamlParser
 	 */
 	public function render()
 	{
-		$__aSource		 = explode(self::TOKEN_LINE, $this->sSource	 = $this->parseBreak($this->sSource));
+		$__aSource = explode(self::TOKEN_LINE, $this->sSource = $this->parseBreak($this->sSource));
 		$__sCompiled = '';
 		if (count($__aSource) == 1)
 			$__sCompiled = $this->parseLine($__aSource[0]);
-		else
-		{
-			if ( ($__sC = $this->compiled()) && $this->bCompile ){
+		else {
+			if (($__sC = $this->compiled()) && $this->bCompile) {
 				$__sCompiled = $__sC;
-			} else
-			{
+			} else {
 				$__iIndent = 0;
 				$__iIndentLevel = 0;
-				foreach ($__aSource as $__iKey => $__sLine)
-				{
+				foreach ($__aSource as $__iKey => $__sLine) {
 					$__iLevel = $this->countLevel($__sLine);
 					if ($__iLevel <= $__iIndentLevel)
 						$__iIndent = $__iIndentLevel = 0;
-					if (preg_match('/\\'.self::TOKEN_LEVEL.'([0-9]+)$/', $__sLine, $__aMatches))
-					{
+					if (preg_match('/\\' . self::TOKEN_LEVEL . '([0-9]+)$/', $__sLine, $__aMatches)) {
 						$__iIndent = (int)$__aMatches[1];
 						$__iIndentLevel = $__iLevel;
-						$__sLine = preg_replace('/\\'.self::TOKEN_LEVEL."$__iIndent$/", '', $__sLine);
+						$__sLine = preg_replace('/\\' . self::TOKEN_LEVEL . "$__iIndent$/", '', $__sLine);
 					}
 					$__sLine = str_repeat(self::TOKEN_INDENT, $__iIndent * self::INDENT) . $__sLine;
 					$__aSource[$__iKey] = $__sLine;
 				}
-				$__aSource		 = explode(self::TOKEN_LINE, $this->sSource	 = $this->parseBreak($this->sSource));
-				$__sCompiled	 = $this->compile($this->parseFile($__aSource));
+				$__aSource = explode(self::TOKEN_LINE, $this->sSource = $this->parseBreak($this->sSource));
+				$__sCompiled = $this->compile($this->parseFile($__aSource));
 			}
 			ob_start();
 			foreach (self::$aVariables as $__sName => $__mValue)
-				$$__sName	 = $__mValue;
+				$$__sName = $__mValue;
 			require $__sCompiled;
 			$__sCompiled = trim(ob_get_contents());
 			foreach ($this->aFilters as $mFilter)
@@ -239,18 +229,18 @@ class HamlParser
 
 	private function _include($sPath, $iIndent)
 	{
-		$p		 = new HamlParser($this->sPath);
+		$p = new HamlParser($this->sPath);
 		$p->setPath($this->sPath);
 		$p->append(self::$aVariables);
 		$sSource = $p->fetch($this->getFilename($sPath));
 		ob_start();
-		if ( ($file	 = $p->compiled()) === false ){
+		if (($file = $p->compiled()) === false) {
 			$file = $p->compile($sSource);
 		}
 		require $file;
-		$c		 = trim(ob_get_contents());
+		$c = trim(ob_get_contents());
 		ob_clean();
-		$s	 = $p->sourceIndent($c, $iIndent);
+		$s = $p->sourceIndent($c, $iIndent);
 		echo $s . "\n";
 	}
 
@@ -264,14 +254,14 @@ class HamlParser
 		if (!$this->bCompile)
 			return false;
 		$sSourceHash = '';
-		if ( function_exists('hash') )
+		if (function_exists('hash'))
 			$sSourceHash = hash('md5', $this->sSource);
 		else
 			$sSourceHash = md5($this->sSource);
-		$sFilename	 = "{$this->sTmp}/$sSourceHash.hphp";
-		if ( file_exists($sFilename) )
+		$sFilename = "{$this->sTmp}/$sSourceHash.hphp";
+		if (file_exists($sFilename))
 			return $sFilename;
-		else{
+		else {
 			return false;
 		}
 	}
@@ -285,10 +275,10 @@ class HamlParser
 	public function compile($sCompiled)
 	{
 		$sSourceHash = '';
-		if (function_exists('hash'))
-		$sSourceHash = hash('md5', $this->sSource);
-		else
-			$sSourceHash = md5($this->sSource);
+		//if (function_exists('hash'))
+		//$sSourceHash = hash('md5', $this->sSource);
+		//else
+		$sSourceHash = md5($this->sSource);
 		$sFilename = "{$this->sTmp}/$sSourceHash.hphp";
 		file_put_contents($sFilename, $sCompiled);
 		return $sFilename;
@@ -312,7 +302,7 @@ class HamlParser
 	 */
 	public function parseBreak($sFile)
 	{
-		$sFile = preg_replace('/\\'.self::TOKEN_BREAK.'\s*/', '', $sFile);
+		$sFile = preg_replace('/\\' . self::TOKEN_BREAK . '\s*/', '', $sFile);
 		return $sFile;
 	}
 
@@ -327,9 +317,9 @@ class HamlParser
 		$x = ($this->iIndent - $iLevel - 1) * self::INDENT;
 		$sSource = '';
 		if ($x >= 0)
-			$sSource = preg_replace('|^'.str_repeat(self::TOKEN_INDENT, ($iLevel + 1) * self::INDENT).'|', '', $this->sRealSource);
+			$sSource = preg_replace('|^' . str_repeat(self::TOKEN_INDENT, ($iLevel + 1) * self::INDENT) . '|', '', $this->sRealSource);
 		foreach ($this->aChildren as $oChild)
-			$sSource .= self::TOKEN_LINE.$oChild->getAsSource($iLevel);
+			$sSource .= self::TOKEN_LINE . $oChild->getAsSource($iLevel);
 		return trim($sSource, self::TOKEN_LINE);
 	}
 
@@ -359,8 +349,7 @@ class HamlParser
 	{
 		$aLevels = array(-1 => $this);
 		$sCompiled = '';
-		foreach ($aSource as $sSource)
-		{
+		foreach ($aSource as $sSource) {
 			$iLevel = $this->countLevel($sSource);
 			$aLevels[$iLevel] = $this->createLine($sSource, $aLevels[$iLevel - 1]);
 		}
@@ -423,6 +412,7 @@ class HamlParser
 	 */
 	public function parseLine($sSource)
 	{
+		$sSource = rtrim($sSource);
 		$sParsed = '';
 		$sRealBegin = '';
 		$sRealEnd = '';
@@ -430,187 +420,169 @@ class HamlParser
 		$sParsedEnd = '';
 		$bParse = true;
 		// Doctype parsing
-		if (preg_match('/^'.self::TOKEN_DOCTYPE.'(.*)/', $sSource, $aMatches))
-		{
+		if (preg_match('/^' . self::TOKEN_DOCTYPE . '(.*)/', $sSource, $aMatches)) {
 			$aMatches[1] = trim($aMatches[1]);
 			if ($aMatches[1] == '')
-			  $aMatches[1] = '1.1';
+				$aMatches[1] = '1.1';
 			$sParsed = self::$aDoctypes[$aMatches[1]];
 		} else
-		// PHP include
-		if ( preg_match('/^(\s*)' . self::TOKEN_INCLUDE . ' (.+)/', $sSource, $aMatches) )
-		{
-			$sParsed = '<?php $this->_include("' . trim($aMatches[ 2 ]) . '", ' . $this->iIndent . ') ?>';
-					} else
-		// PHP instruction
-		if (preg_match('/^'.self::TOKEN_INSTRUCTION_PHP.' (.*)/', $sSource, $aMatches))
-		{
-			$bBlock = false;
-			// Check for block
-			if (preg_match('/^('.implode('|', self::$aPhpBlocks).')/', $aMatches[1]))
-			  $this->bBlock = $bBlock = true;
-			$sParsedBegin = "<?php {$aMatches[1]}" . ($bBlock ? ' {' : ';') . " ?>\n";
-			if ($bBlock)
-			  $sParsedEnd = "<?php } ?>\n";
-		} else
-		// Text block
-		if (preg_match('/^'.self::TOKEN_TEXT_BLOCKS.'(.+)/', $sSource, $aMatches))
-		{
-			$sParsed = $this->indent($this->parseTextBlock($aMatches[1], $this->getAsSource($this->iIndent)));
-			$this->aChildren = array();
-		} else
-		// Check for PHP
-		if (preg_match('/^'.self::TOKEN_PARSE_PHP.' (.*)/', $sSource, $aMatches))
-			$sParsed = $this->indent("<?php echo \"" . addslashes($aMatches[ 1 ]) . "\"; ?>\n");
-		else
-		{
-			$aAttributes = array();
-			$sAttributes = '';
-			$sTag = 'div';
-			$sToParse = '';
-			$sContent = '';
-			$sAutoVar = '';
-
-			// Parse options
-			preg_match('/\\'.self::TOKEN_OPTIONS_LEFT.'(.*?)\\'.self::TOKEN_OPTIONS_RIGHT.'/', $sSource, $aMatches);
-			if (count($aMatches) > 1)
-			{
-				$sSource = str_replace($aMatches[0], '', $sSource);
-				$aOptions = explode(self::TOKEN_OPTIONS_SEPARATOR, $aMatches[1]);
-				foreach ($aOptions as $sOption)
-				{
-					$aOption = explode(self::TOKEN_OPTION_VALUE, trim($sOption));
-					foreach ($aOption as $k => $o)
-						$aOption[$k] = trim($o);
-					$sOptionName = ltrim($aOption[0], self::TOKEN_OPTION);
-					$aAttributes[$sOptionName] = $aOption[1];
-				}
-			}
-
-			$sFirst = '['.self::TOKEN_TAG.'|'.self::TOKEN_ID.'|'.self::TOKEN_CLASS.'|'.self::TOKEN_PARSE_PHP.']';
-
-			if (preg_match("/($sFirst.*?) (.*)/", $sSource, $aMatches))
-			{
-				$sToParse = $aMatches[1];
-				$sContent = $aMatches[2];
+			// PHP include
+			if (preg_match('/^(\s*)' . self::TOKEN_INCLUDE . ' (.+)/', $sSource, $aMatches)) {
+				$sParsed = '<?php $this->_include("' . trim($aMatches[2]) . '", ' . $this->iIndent . ') ?>';
 			} else
-			if (preg_match("/($sFirst.*)/", $sSource, $aMatches))
-				$sToParse = $aMatches[1];
-			else
-			{
-				// Check for comment
-				if (!preg_match('/^\\'.self::TOKEN_COMMENT.'(.*)/', $sSource, $aMatches))
-				{
-					$sParsed = $this->indent($sSource);
-					foreach ($this->aChildren as $oChild)
-						$sParsed .= $oChild;
-				}
-				else
-				{
-					$aMatches[1] = trim($aMatches[1]);
-					if ($aMatches[1] && !preg_match('/\[.*\]/', $aMatches[1]))
-						$sParsed = $this->indent(wordwrap($aMatches[1], 60, "\n"), 1)."\n";
-				}
-				$bParse = false;
-			}
-
-			if ($bParse)
-			{
-				$bPhp = false;
-				$bClosed = false;
-				// Match tag
-				if (preg_match('/^'.self::TOKEN_TAG.'([a-zA-Z0-9]*)/', $sToParse, $aMatches))
-					$sTag = $aMatches[1];
-				// Match ID
-				if (preg_match('/'.self::TOKEN_ID.'([a-zA-Z0-9_]*)/', $sToParse, $aMatches))
-					$aAttributes['id'] = "'{$aMatches[1]}'";
-				// Match classes
-				if (preg_match_all('/\\'.self::TOKEN_CLASS.'([a-zA-Z0-9_-]*)/', $sToParse, $aMatches))
-					$aAttributes['class'] = '\''.implode(' ', $aMatches[1]).'\'';
-				// Check for PHP
-				if (preg_match('/'.self::TOKEN_PARSE_PHP.'/', $sToParse))
-				{
-					$sContentOld = $sContent;
-					$sContent	 = "<?php echo {$sContent}; ?>\n";
-					$bPhp = true;
-				}
-				// Match translating
-				if (preg_match('/\\'.self::TOKEN_TRANSLATE.'$/', $sToParse, $aMatches))
-				{
-					if (!$bPhp)
-						$sContent = "'$sContent'";
-					else
-						$sContent = $sContentOld;
-					$sContent = "<?php echo {$this->sTranslate}($sContent); ?>\n";
-				}
-				// Match single tag
-				if (preg_match('/\\'.self::TOKEN_SINGLE.'$/', $sToParse))
-					$bClosed = true;
-				// Match brackets
-				if (preg_match('/\\'.self::TOKEN_AUTO_LEFT.'(.*?)\\'.self::TOKEN_AUTO_RIGHT.'/', $sToParse, $aMatches))
-					$sAutoVar = $aMatches[1];
-
-				if (!empty($aAttributes) || !empty($sAutoVar))
-					$sAttributes = '<?php $this->writeAttributes('.$this->arrayExport($aAttributes).(!empty($sAutoVar) ? ", \$this->parseSquareBrackets($sAutoVar)" : '' ).'); ?>';
-				$this->bBlock = $this->oParent->bBlock;
-				$iLevelM = $this->oParent->bBlock || $this->bBlock ? -1 : 0;
-				// Check for block tag
-				if (!$this->isInline($sTag) && !$this->isClosed($sTag) && !$bClosed)
-				{
-					$sParsedBegin	 = $this->indent("<$sTag$sAttributes>", $iLevelM);
-					if (!empty($sContent))
-						if (strlen($sContent) > 60)
-							$sParsed = $this->indent(wordwrap($sContent, 60, "\n"), 1+$iLevelM);
-						else
-							$sParsed = $this->indent($sContent, 1+$iLevelM);
-					$sParsedEnd		 = $this->indent("</$sTag>", $iLevelM);
+				// PHP instruction
+				if (preg_match('/^' . self::TOKEN_INSTRUCTION_PHP . ' (.*)/', $sSource, $aMatches)) {
+					$bBlock = false;
+					// Check for block
+					if (preg_match('/^(' . implode('|', self::$aPhpBlocks) . ')/', $aMatches[1]))
+						$this->bBlock = $bBlock = true;
+					$sParsedBegin = "<?php {$aMatches[1]}" . ($bBlock ? ' {' : ';') . " ?>\n";
+					if ($bBlock)
+						$sParsedEnd = "<?php } ?>\n";
 				} else
-				// Check for inline tag
-				if ($this->isInline($sTag) && !$bClosed)
-				{
-					$sParsedBegin = $this->indent("<$sTag$sAttributes>", $iLevelM, false);
-					$sParsed = $sContent;
-					$sParsedEnd = "</$sTag>\n";
-				}
-				// Check for closed tag
-				else
-					$sParsedBegin = $this->indent("<$sTag$sAttributes />", $iLevelM);
-			}
-		}
+					// Text block
+					if (preg_match('/^' . self::TOKEN_TEXT_BLOCKS . '(.+)/', $sSource, $aMatches)) {
+						$sParsed = $this->indent($this->parseTextBlock($aMatches[1], $this->getAsSource($this->iIndent)));
+						$this->aChildren = array();
+					} else
+						// Check for PHP
+						if (preg_match('/^' . self::TOKEN_PARSE_PHP . ' (.*)/', $sSource, $aMatches))
+							$sParsed = $this->indent("<?php echo \"" . addslashes($aMatches[1]) . "\"; ?>\n");
+						else {
+							$aAttributes = array();
+							$sAttributes = '';
+							$sTag = 'div';
+							$sToParse = '';
+							$sContent = '';
+							$sAutoVar = '';
+
+							// Parse options
+							preg_match('/\\' . self::TOKEN_OPTIONS_LEFT . '(.*?)\\' . self::TOKEN_OPTIONS_RIGHT . '/', $sSource, $aMatches);
+							if (count($aMatches) > 1) {
+								$sSource = str_replace($aMatches[0], '', $sSource);
+								$aOptions = explode(self::TOKEN_OPTIONS_SEPARATOR, $aMatches[1]);
+								foreach ($aOptions as $sOption) {
+									$aOption = explode(self::TOKEN_OPTION_VALUE, trim($sOption));
+									foreach ($aOption as $k => $o)
+										$aOption[$k] = trim($o);
+									$sOptionName = ltrim($aOption[0], self::TOKEN_OPTION);
+									$aAttributes[$sOptionName] = $aOption[1];
+								}
+							}
+
+							$sFirst = '[' . self::TOKEN_TAG . '|' . self::TOKEN_ID . '|' . self::TOKEN_CLASS . '|' . self::TOKEN_PARSE_PHP . ']';
+
+							if (preg_match("/($sFirst.*?) (.*)/", $sSource, $aMatches)) {
+								$sToParse = $aMatches[1];
+								$sContent = $aMatches[2];
+							} else
+								if (preg_match("/($sFirst.*)/", $sSource, $aMatches))
+									$sToParse = $aMatches[1];
+								else {
+									// Check for comment
+									if (!preg_match('/^\\' . self::TOKEN_COMMENT . '(.*)/', $sSource, $aMatches)) {
+										$sParsed = $this->indent($sSource);
+										foreach ($this->aChildren as $oChild)
+											$sParsed .= $oChild;
+									} else {
+										$aMatches[1] = trim($aMatches[1]);
+										if ($aMatches[1] && !preg_match('/\[.*\]/', $aMatches[1]))
+											$sParsed = $this->indent(wordwrap($aMatches[1], 60, "\n"), 1) . "\n";
+									}
+									$bParse = false;
+								}
+
+							if ($bParse) {
+								$bPhp = false;
+								$bClosed = false;
+								// Match tag
+								if (preg_match('/^' . self::TOKEN_TAG . '([a-zA-Z0-9]*)/', $sToParse, $aMatches))
+									$sTag = $aMatches[1];
+								// Match ID
+								if (preg_match('/' . self::TOKEN_ID . '([a-zA-Z0-9_]*)/', $sToParse, $aMatches))
+									$aAttributes['id'] = "'{$aMatches[1]}'";
+								// Match classes
+								if (preg_match_all('/\\' . self::TOKEN_CLASS . '([a-zA-Z0-9_-]*)/', $sToParse, $aMatches)) {
+									$aAttributes['class'] = '\'' . implode(' ', $aMatches[1]) . '\'';
+								}
+								// Check for PHP
+								if (preg_match('/' . self::TOKEN_PARSE_PHP . '/', $sToParse)) {
+									$sContentOld = $sContent;
+									$sContent = "<?php echo {$sContent}; ?>";
+									$bPhp = true;
+								}
+								// Match translating
+								if (preg_match('/\\' . self::TOKEN_TRANSLATE . '$/', $sToParse, $aMatches)) {
+									if (!$bPhp)
+										$sContent = "'$sContent'";
+									else
+										$sContent = $sContentOld;
+									$sContent = "<?php echo {$this->sTranslate}($sContent); ?>\n";
+								}
+								// Match single tag
+								if (preg_match('/\\' . self::TOKEN_SINGLE . '$/', $sToParse))
+									$bClosed = true;
+								// Match brackets
+								if (preg_match('/\\' . self::TOKEN_AUTO_LEFT . '(.*?)\\' . self::TOKEN_AUTO_RIGHT . '/', $sToParse, $aMatches))
+									$sAutoVar = $aMatches[1];
+
+								if (!empty($aAttributes) || !empty($sAutoVar))
+									$sAttributes = '<?php $this->writeAttributes(' . $this->arrayExport($aAttributes) . (!empty($sAutoVar) ? ", \$this->parseSquareBrackets($sAutoVar)" : '') . '); ?>';
+								$this->bBlock = $this->oParent->bBlock;
+								$iLevelM = $this->oParent->bBlock || $this->bBlock ? -1 : 0;
+								// Check for block tag
+								if (!$this->isInline($sTag) && !$this->isClosed($sTag) && !$bClosed) {
+									$sParsedBegin = $this->indent("<$sTag$sAttributes>", $iLevelM);
+									if (!empty($sContent))
+										if (strlen($sContent) > 60)
+											$sParsed = $this->indent(wordwrap($sContent, 60, "\n"), 1 + $iLevelM);
+										else
+											$sParsed = $this->indent($sContent, 1 + $iLevelM);
+									$sParsedEnd = $this->indent("</$sTag>", $iLevelM);
+								} else
+									// Check for inline tag
+									if ($this->isInline($sTag) && !$bClosed) {
+										$separator = '';
+										if (!empty($this->aChildren)) {
+											$separator = "\n";
+										}
+										$sParsedBegin = $this->indent("<$sTag$sAttributes>", $iLevelM, false);
+										$sParsed = $separator . $sContent;
+										$sParsedEnd = (!empty($separator) ? $this->indent("</$sTag>", $iLevelM, false) : "</$sTag>") . "\n";
+									} // Check for closed tag
+									else
+										$sParsedBegin = $this->indent("<$sTag$sAttributes />", $iLevelM);
+							}
+						}
 		foreach ($this->aChildren as $oChild)
-		$sParsed .= $oChild;
+			$sParsed .= $oChild;
+
 		// Check for IE comment
-		if ( preg_match('/^\\' . self::TOKEN_COMMENT . '\[(.*?)\](.*)/', $sSource, $aMatches) )
-		{
-			$aMatches[ 2 ] = trim($aMatches[ 2 ]);
-			if ( count($this->aChildren) == 0 )
-			{
-				$sParsedBegin	 = $this->indent("<!--[{$aMatches[ 1 ]}]> $sParsedBegin", 0, false);
-				$sParsed		 = $aMatches[ 2 ];
-				$sParsedEnd		 = "$sParsedEnd <![endif]-->\n";
-			} else
-			{
-				$sParsed		 = $sParsedBegin . $sParsed . $sParsedEnd;
-				$sParsedBegin	 = $this->indent("<!--[{$aMatches[ 1 ]}]>");
-				$sParsedEnd		 = $this->indent("<![endif]-->");
+		if (preg_match('/^\\' . self::TOKEN_COMMENT . '\[(.*?)\](.*)/', $sSource, $aMatches)) {
+			$aMatches[2] = trim($aMatches[2]);
+			if (count($this->aChildren) == 0) {
+				$sParsedBegin = $this->indent("<!--[{$aMatches[1]}]> $sParsedBegin", 0, false);
+				$sParsed = $aMatches[2];
+				$sParsedEnd = "$sParsedEnd <![endif]-->\n";
+			} else {
+				$sParsed = $sParsedBegin . $sParsed . $sParsedEnd;
+				$sParsedBegin = $this->indent("<!--[{$aMatches[1]}]>");
+				$sParsedEnd = $this->indent("<![endif]-->");
 			}
 		} else
-		// Check for comment
-		if ( preg_match('/^\\' . self::TOKEN_COMMENT . '(.*)/', $sSource, $aMatches) )
-		{
-			$aMatches[ 1 ] = trim($aMatches[ 1 ]);
-			if ( count($this->aChildren) == 0 )
-			{
-				$sParsedBegin	 = $this->indent("<!-- $sParsedBegin", 0, false);
-				$sParsed		 = $aMatches[ 1 ];
-				$sParsedEnd		 = "$sParsedEnd -->\n";
-			} else
-			{
-				$sParsed = $sParsedBegin.$sParsed.$sParsedEnd;
-				$sParsedBegin	 = $this->indent("<!--");
-				$sParsedEnd		 = $this->indent("-->");
+			// Check for comment
+			if (preg_match('/^\\' . self::TOKEN_COMMENT . '(.*)/', $sSource, $aMatches)) {
+				$aMatches[1] = trim($aMatches[1]);
+				if (count($this->aChildren) == 0) {
+					$sParsedBegin = $this->indent("<!-- $sParsedBegin", 0, false);
+					$sParsed = $aMatches[1];
+					$sParsedEnd = "$sParsedEnd -->\n";
+				} else {
+					$sParsed = $sParsedBegin . $sParsed . $sParsedEnd;
+					$sParsedBegin = $this->indent("<!--");
+					$sParsedEnd = $this->indent("-->");
+				}
 			}
-		}
 		$sCompiled = $sRealBegin . $sParsedBegin . $sParsed . $sParsedEnd . $sRealEnd;
 		return $sCompiled;
 	}
@@ -626,11 +598,10 @@ class HamlParser
 	protected function indent($sLine, $iAdd = 0, $bNew = true)
 	{
 		$aLine = explode("\n", $sLine);
-		$sIndented		 = '';
-		if ( $this->iIndent < 0 )
-			$this->iIndent	 = 0;
-		foreach ( $aLine as $sLine )
-		{
+		$sIndented = '';
+		if ($this->iIndent < 0)
+			$this->iIndent = 0;
+		foreach ($aLine as $sLine) {
 			$sIndented .= str_repeat("\t", $this->iIndent + $iAdd) . ($bNew ? "$sLine\n" : $sLine);
 		}
 		return $sIndented;
@@ -645,11 +616,11 @@ class HamlParser
 	 */
 	protected function sourceIndent($sSource, $iLevel)
 	{
-		$aSource		 = explode(self::TOKEN_LINE, $sSource);
+		$aSource = explode(self::TOKEN_LINE, $sSource);
 		foreach ($aSource as $sKey => $sValue)
 			$aSource[$sKey] = str_repeat(self::TOKEN_INDENT, $iLevel * self::INDENT) . $sValue;
-			$sSource = implode(self::TOKEN_LINE, $aSource);
-			return $sSource;
+		$sSource = implode(self::TOKEN_LINE, $aSource);
+		return $sSource;
 	}
 
 	/**
@@ -686,27 +657,27 @@ class HamlParser
 	}
 
 
-	const TOKEN_LINE = "\n";//+
-	const TOKEN_INDENT			 = "\t"; //+
-	const TOKEN_TAG = '%';//+
-	const TOKEN_ID = '#';//+
-	const TOKEN_CLASS = '.';//+
-	const TOKEN_OPTIONS_LEFT = '{';//+
-	const TOKEN_OPTIONS_RIGHT = '}';//+
-	const TOKEN_OPTIONS_SEPARATOR = ',';//+
+	const TOKEN_LINE = "\n"; //+
+	const TOKEN_INDENT = "\t"; //+
+	const TOKEN_TAG = '%'; //+
+	const TOKEN_ID = '#'; //+
+	const TOKEN_CLASS = '.'; //+
+	const TOKEN_OPTIONS_LEFT = '{'; //+
+	const TOKEN_OPTIONS_RIGHT = '}'; //+
+	const TOKEN_OPTIONS_SEPARATOR = ','; //+
 	const TOKEN_OPTION = ':'; //+
-	const TOKEN_OPTION_VALUE = '=>';//+
+	const TOKEN_OPTION_VALUE = '=>'; //+
 	const TOKEN_INSTRUCTION_PHP = '-'; //+
-	const TOKEN_PARSE_PHP = '=';//+
-	const TOKEN_DOCTYPE = '!!!';//+
+	const TOKEN_PARSE_PHP = '='; //+
+	const TOKEN_DOCTYPE = '!!!'; //+
 	const TOKEN_INCLUDE = '!!'; //+
 	const TOKEN_COMMENT = '/'; //+
 	const TOKEN_TRANSLATE = '$'; //+
 	const TOKEN_LEVEL = '?'; //+
 	const TOKEN_SINGLE = '/'; //+
 	const TOKEN_BREAK = '|'; //+
-	const TOKEN_AUTO_LEFT = '[';//+
-	const TOKEN_AUTO_RIGHT = ']';//+
+	const TOKEN_AUTO_LEFT = '['; //+
+	const TOKEN_AUTO_RIGHT = ']'; //+
 	const TOKEN_TEXT_BLOCKS = ':'; //+
 
 	const INDENT = 1; //+
@@ -718,12 +689,12 @@ class HamlParser
 	 */
 	protected static $aDoctypes = array
 	(
-		'1.1'			 => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
-		'Strict'		 => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
-		'Transitional'	 => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-		'Frameset'		 => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">',
-		'XML'			 => "<?php echo '<?xml version=\"1.0\" encoding=\"utf-8\" ?>'; ?>\n",
-		'5'				 => "<!DOCTYPE html>\n"
+		'1.1' => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+		'Strict' => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+		'Transitional' => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+		'Frameset' => '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">',
+		'XML' => "<?php echo '<?xml version=\"1.0\" encoding=\"utf-8\" ?>'; ?>\n",
+		'5' => "<!DOCTYPE html>\n"
 	);
 
 	/**
@@ -809,8 +780,8 @@ class HamlParser
 		foreach ($oDirs as $oDir)
 			if (!$oDir->isDot())
 				if (preg_match('/\.hphp/', $oDir->getPathname()))
-				unlink($oDir->getPathname());
-				return $this;
+					unlink($oDir->getPathname());
+		return $this;
 	}
 
 	/**
@@ -891,8 +862,7 @@ class HamlParser
 		$sType = gettype($mVariable);
 		$aAttr = array();
 		$sId = '';
-		if ($sType == 'object')
-		{
+		if ($sType == 'object') {
 			static $__objectNamesCache;
 			if (!is_array($__objectNamesCache))
 				$__objectNamesCache = array();
@@ -903,11 +873,11 @@ class HamlParser
 				$sType = $__objectNamesCache[$sClass];
 			if (method_exists($mVariable, 'getID'))
 				$sId = $mVariable->getID(); else
-			if (!empty($mVariable->ID))
-				$sId = $mVariable->ID;
+				if (!empty($mVariable->ID))
+					$sId = $mVariable->ID;
 		}
 		if ($sId == '')
-			$sId = substr(md5(uniqid(serialize($mVariable).rand(), true)), 0, 8);
+			$sId = substr(md5(uniqid(serialize($mVariable) . rand(), true)), 0, 8);
 		$aAttr['class'] = strtolower($sType);
 		$aAttr['id'] = "{$aAttr['class']}_$sId";
 		return $aAttr;
@@ -923,7 +893,7 @@ class HamlParser
 			$aAttr = array_merge($aAttr, $aArray);
 		foreach ($aAttr as $sName => $sValue)
 			if ($sValue)
-				echo " $sName=\"".htmlentities($sValue).'"';
+				echo " $sName=\"" . htmlentities($sValue) . '"';
 	}
 
 	/**
@@ -939,13 +909,12 @@ class HamlParser
 			$aArray = array_merge($aArray, $aArg);
 		foreach ($aArray as $sKey => $sValue)
 			$aNArray[] = "'$sKey' => $sValue";
-		$sArray .= implode(', ', $aNArray).')';
+		$sArray .= implode(', ', $aNArray) . ')';
 		return $sArray;
 	}
 }
 
-if (!function_exists('fake_translate'))
-{
+if (!function_exists('fake_translate')) {
 	/**
 	 * Fake translation function used
 	 * as default translation function
@@ -978,8 +947,7 @@ function display_haml($sFilename, $aVariables = array(), $sTmp = true, $bGPSSC =
 	if (!is_object($__oHaml))
 		$__oHaml = new HamlParser(dirname($sPath), $sTmp);
 	$__oHaml->append($GLOBALS);
-	if ($bGPSSC)
-	{
+	if ($bGPSSC) {
 		$__oHaml->append($_GET);
 		$__oHaml->append($_POST);
 		$__oHaml->append($_SESSION);

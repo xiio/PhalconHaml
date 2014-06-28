@@ -21,6 +21,7 @@ namespace Phalcon\Mvc\View\Engine {
 		{
 			$this->_parser = new \HamlParser($view->getViewsDir());
 			$this->_parser->setPath($view->getViewsDir());
+			$this->_parser->setTmp($view->getViewsDir().'/.cache');
 			$view->disableLevel(array(
 				\Phalcon\Mvc\View::LEVEL_ACTION_VIEW => true,
 				\Phalcon\Mvc\View::LEVEL_LAYOUT		 => true,

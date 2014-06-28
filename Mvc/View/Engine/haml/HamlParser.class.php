@@ -179,6 +179,9 @@ class HamlParser
 	 */
 	public function setTmp($sTmp)
 	{
+		if (!file_exists($sTmp)) {
+			mkdir($sTmp);
+		}
 		$this->sTmp = realpath($sTmp);
 		return $this;
 	}
@@ -191,7 +194,6 @@ class HamlParser
 	public function render()
 	{
 		$__aSource = explode(self::TOKEN_LINE, $this->sSource = $this->parseBreak($this->sSource));
-		$__sCompiled = '';
 		if (count($__aSource) == 1)
 			$__sCompiled = $this->parseLine($__aSource[0]);
 		else {
@@ -231,6 +233,7 @@ class HamlParser
 	{
 		$p = new HamlParser($this->sPath);
 		$p->setPath($this->sPath);
+		$p->setTmp($this->sTmp);
 		$p->append(self::$aVariables);
 		$sSource = $p->fetch($this->getFilename($sPath));
 		ob_start();
@@ -266,7 +269,7 @@ class HamlParser
 		}
 	}
 
-	/*	 * par
+	/**
 	 * Save compiled template
 	 *
 	 * @param string Compiled template
@@ -274,12 +277,12 @@ class HamlParser
 	 */
 	public function compile($sCompiled)
 	{
-		$sSourceHash = '';
-		//if (function_exists('hash'))
-		//$sSourceHash = hash('md5', $this->sSource);
-		//else
-		$sSourceHash = md5($this->sSource);
-		$sFilename = "{$this->sTmp}/$sSourceHash.hphp";
+		if (function_exists('hash'))
+			$sSourceHash = hash('md5', $this->sSource);
+		else
+			$sSourceHash = md5($this->sSource);
+		$viewName = preg_replace('/[^\da-z]/i', '_', str_replace($this->sPath, '', $this->sFile));
+		$sFilename = "{$this->sTmp}/{$sSourceHash}{$viewName}.hphp";
 		file_put_contents($sFilename, $sCompiled);
 		return $sFilename;
 	}
@@ -334,6 +337,7 @@ class HamlParser
 	{
 		$oHaml = new HamlParser($this->sPath, $this->bCompile, $parent);
 		$oHaml->setSource($sLine);
+		$oHaml->setTmp($this->sTmp);
 		$oHaml->iIndent = $parent->iIndent + 1;
 		$parent->aChildren[] = $oHaml;
 		return $oHaml;

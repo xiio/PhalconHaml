@@ -898,6 +898,8 @@ class HamlParser
 		foreach ($aAttr as $sName => $sValue)
 			if ($sValue)
 				echo " $sName=\"" . htmlentities($sValue) . '"';
+			else
+				echo " " . $sName;
 	}
 
 	/**
@@ -911,8 +913,13 @@ class HamlParser
 		$aArray = $aNArray = array();
 		foreach (func_get_args() as $aArg)
 			$aArray = array_merge($aArray, $aArg);
-		foreach ($aArray as $sKey => $sValue)
-			$aNArray[] = "'$sKey' => $sValue";
+		foreach ($aArray as $sKey => $sValue) {
+			if (empty($sValue)) {
+				$aNArray[] = "'$sKey' => ''";
+			} else
+				$aNArray[] = "'$sKey' => $sValue";
+		}
+
 		$sArray .= implode(', ', $aNArray) . ')';
 		return $sArray;
 	}
